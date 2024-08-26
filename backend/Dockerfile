@@ -1,0 +1,30 @@
+# Utiliser l'image Python 3.12 slim (slim permet une image plus légère nous demande d'installer manuellement les dépendances système nécessaires)
+FROM python:3.12-slim
+
+# Installer les dépendance système nécessaires ( comme un utilise un image slim on doit ajouter build-essential et libpq-dev pour l'utilisation de postgrSQL)
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    && apt-get clean \ 
+    && rm -rf /var/lib/apt/lists/*
+
+# Créer un répertoire de travail
+WORKDIR /app
+
+# Copier le fichier requirements.txt
+COPY requirements.txt /app/
+
+# Installer les dépendances Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copier le reste de l'application dans le conteneur
+COPY . /app/
+
+# Exposer le port 8000 pour Django
+EXPOSE 8000
+
+# Collecter les fichiers statiques (utilisé en production)
+RUN python manage.py collectstatic --noinput
+
+# Utiliser Gunicorn pour lancer l'application (production-ready)
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "nom_du_projet.wsgi:application"]

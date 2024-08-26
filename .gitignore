@@ -1,0 +1,16 @@
+# Ignorer l'environnement virtuel
+.env/
+
+# Ignorer les fichiers de configuration sensibles
+.env
+
+# Ignorer les fichiers Python compilés
+__pycache__/
+*.py[cod]
+
+# Ignorer la base de données SQLite (si utilisée en développement)
+db.sqlite3
+
+# Ignorer les fichiers générés par Docker
+*/venv
+docker-compose.override.yml
