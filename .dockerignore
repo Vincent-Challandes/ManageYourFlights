@@ -1,0 +1,34 @@
+# Ignorer les fichiers d'environnement virtuel (si présents)
+.env/
+venv/
+
+# Ignorer les fichiers de configuration locaux (variables sensibles)
+.env
+
+# Ignorer les fichiers Python compilés
+__pycache__/
+*.py[cod]
+
+# Ignorer les fichiers de logs
+*.log
+
+# Ignorer les bases de données locales
+*.sqlite3
+*.db
+
+# Ignorer les fichiers spécifiques à l'IDE ou à l'éditeur de texte
+.vscode/
+.idea/
+
+# Ignorer les fichiers de test locaux
+tests/
+coverage/
+*.cover
+*.pytest_cache/
+
+# Ignorer les fichiers générés par Git
+.git/
+.gitignore
+
+# Ignorer les fichiers Docker de surcouche
+docker-compose.override.yml
