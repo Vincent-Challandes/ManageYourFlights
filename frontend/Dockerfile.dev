@@ -1,0 +1,20 @@
+# Utiliser l'image officielle Node.js 20 (la dernière version LTS)
+FROM node:20.17.0-slim
+
+# Créer un répertoire de travail dans le conteneur
+WORKDIR /app
+
+# Copier le fichier package.json et package-lock.json pour installer les dépendances
+COPY package*.json ./
+
+# Installer les dépendances Node.js
+RUN npm install
+
+# Copier le reste du code source dans le répertoire de travail
+COPY . .
+
+# Exposer le port 8080 pour l'application Vue.js
+EXPOSE 8080
+
+# Commande pour démarrer l'application en mode développement ou production
+CMD ["npm", "run", "serve"]
