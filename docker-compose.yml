@@ -1,0 +1,44 @@
+version: "3" # Spécifie la version de la syntaxe Docker Compose utilisée. La version 3 est couramment utilisée et offre de nombreuses fonctionnalités.
+
+services: # Déclaration des services (conteneurs) que Docker Compose va gérer.
+  backend:
+    build:
+      context: ./backend # Définit le contexte de construction pour l'image Docker du backend. Cela signifie que Docker utilisera le dossier './backend' pour construire l'image.
+      dockerfile: Dockerfile.dev # Spécifie le Dockerfile à utiliser pour construire l'image Docker du backend. Ici, il utilise 'Dockerfile.dev' pour l'environnement de développement.
+    container_name: django_backend_dev # Nom du conteneur Docker pour le backend. Ce nom est utile pour identifier le conteneur dans Docker.
+    volumes:
+      - ./backend:/app # Monte le répertoire local './backend' dans le conteneur Docker sous '/app'. Cela permet de travailler avec les fichiers locaux et de les synchroniser avec le conteneur.
+    ports:
+      - "8000:8000" # Mappe le port 8000 du conteneur au port 8000 de l'hôte (ta machine locale). Cela permet d'accéder au serveur Django via 'http://localhost:8000'.
+    environment:
+      - DEBUG=${DEBUG} # Définit la variable d'environnement 'DEBUG' à 1 pour activer le mode débogage de Django.
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB} # Spécifie l'URL de connexion à la base de données PostgreSQL. 'db' fait référence au nom du service PostgreSQL défini ci-dessous.
+    depends_on:
+      - db # Indique que le service backend dépend du service 'db' (PostgreSQL) et doit attendre que celui-ci soit démarré avant de démarrer lui-même.
+    command: python manage.py runserver 0.0.0.0:8000 # Commande à exécuter lors du démarrage du conteneur backend. Ici, il démarre le serveur de développement Django.
+
+  frontend:
+    build:
+      context: ./frontend # Définit le contexte de construction pour l'image Docker du frontend. Le dossier './frontend' est utilisé pour construire l'image.
+      dockerfile: Dockerfile.dev # Spécifie le Dockerfile à utiliser pour construire l'image Docker du frontend. Ici, 'Dockerfile.dev' est utilisé pour l'environnement de développement.
+    container_name: vue_frontend_dev # Nom du conteneur Docker pour le frontend Vue.js.
+    volumes:
+      - ./frontend:/app # Monte le répertoire local './frontend' dans le conteneur Docker sous '/app'. Cela permet de synchroniser les fichiers locaux avec le conteneur.
+    ports:
+      - "8080:8080" # Mappe le port 8080 du conteneur au port 8080 de l'hôte. Cela permet d'accéder au serveur de développement Vue.js via 'http://localhost:8080'.
+    command: npm run serve # Commande à exécuter lors du démarrage du conteneur frontend. Ici, il démarre le serveur de développement Vue.js.
+
+  db:
+    image: postgres:16 # Spécifie l'image Docker à utiliser pour le service PostgreSQL. Ici, la version 16 de PostgreSQL est utilisée.
+    container_name: postgres_db_dev # Nom du conteneur Docker pour la base de données PostgreSQL.
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER} # Référence à la variable POSTGRES_USER dans le fichier .env.dev
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # Référence à la variable POSTGRES_PASSWORD dans le fichier .env.dev
+      POSTGRES_DB: ${POSTGRES_DB} # Référence à la variable POSTGRES_DB dans le fichier .env.dev
+    ports:
+      - "5432:5432" # Mappe le port 5432 du conteneur au port 5432 de l'hôte. Cela permet d'accéder à PostgreSQL via 'localhost:5432'.
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data # Lie un volume nommé 'postgres_data_dev' au répertoire '/var/lib/postgresql/data' dans le conteneur, ce qui permet de stocker les données de la base de données de manière persistante.
+
+volumes:
+  postgres_data_dev: # Déclare le volume nommé 'postgres_data_dev' pour stocker les données PostgreSQL. Ce volume permet de persister les données entre les redémarrages du conteneur.
