@@ -1,0 +1,38 @@
+version: "3" # Spécifie la version de la syntaxe Docker Compose utilisée. La version 3 est couramment utilisée et offre de nombreuses fonctionnalités.
+
+services: # Déclaration des services (conteneurs) que Docker Compose va gérer.
+  nginx: # Service Nginx utilisé pour servir les fichiers statiques et rediriger les requêtes vers le backend.
+    image: nginx:alpine # Utilise l'image Nginx basée sur Alpine Linux, qui est légère et optimisée pour la production.
+    container_name: nginx_prod # Nom du conteneur Docker pour le service Nginx en production.
+    ports:
+      - "80:80" # Mappe le port 80 du conteneur au port 80 de l'hôte. Cela permet d'accéder à l'application via http://localhost en production.
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf # Monte le fichier de configuration Nginx personnalisé depuis le dossier local.
+      - ./backend/static:/app/static # Monte les fichiers statiques de Django dans le conteneur pour qu'ils soient servis par Nginx.
+      - ./frontend/dist:/usr/share/nginx/html # Monte les fichiers compilés de Vue.js pour qu'ils soient servis par Nginx.
+    depends_on:
+      - backend # Indique que le service Nginx dépend du backend et doit attendre que celui-ci soit démarré avant de démarrer.
+
+  backend: # Service backend pour exécuter l'application Django en production.
+    build:
+      context: ./backend # Définit le contexte de construction pour l'image Docker du backend. Cela signifie que Docker utilisera le dossier './backend' pour construire l'image.
+      dockerfile: Dockerfile.prod # Spécifie le Dockerfile à utiliser pour construire l'image Docker du backend. Ici, il utilise 'Dockerfile.prod' pour l'environnement de production.
+    container_name: django_backend_prod # Nom du conteneur Docker pour le backend en production.
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB} # Spécifie l'URL de connexion à la base de données PostgreSQL en utilisant les variables d'environnement.
+    expose:
+      - "8000" # Expose le port 8000 du backend pour que Nginx puisse y accéder. Ce port n'est pas mappé à l'extérieur directement.
+    command: gunicorn --bind 0.0.0.0:8000 nom_du_projet.wsgi:application # Utilise Gunicorn pour exécuter l'application Django, ce qui est recommandé en production.
+
+  db: # Service pour exécuter PostgreSQL en production.
+    image: postgres:16 # Spécifie l'image Docker à utiliser pour le service PostgreSQL. Ici, la version 16 de PostgreSQL est utilisée.
+    container_name: postgres_db_prod # Nom du conteneur Docker pour la base de données PostgreSQL en production.
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER} # Référence à la variable POSTGRES_USER définie dans le fichier .env.prod.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # Référence à la variable POSTGRES_PASSWORD définie dans le fichier .env.prod.
+      POSTGRES_DB: ${POSTGRES_DB} # Référence à la variable POSTGRES_DB définie dans le fichier .env.prod.
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data # Monte un volume nommé 'postgres_data_prod' pour stocker les données PostgreSQL de manière persistante.
+
+volumes:
+  postgres_data_prod: # Déclare le volume nommé 'postgres_data_prod' pour stocker les données PostgreSQL. Ce volume permet de persister les données entre les redémarrages du conteneur.
