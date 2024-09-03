@@ -1,5 +1,3 @@
-version: "3" # Spécifie la version de la syntaxe Docker Compose utilisée. La version 3 est couramment utilisée et offre de nombreuses fonctionnalités.
-
 services: # Déclaration des services (conteneurs) que Docker Compose va gérer.
   backend:
     build:
@@ -12,7 +10,12 @@ services: # Déclaration des services (conteneurs) que Docker Compose va gérer.
       - "8000:8000" # Mappe le port 8000 du conteneur au port 8000 de l'hôte (ta machine locale). Cela permet d'accéder au serveur Django via 'http://localhost:8000'.
     environment:
       - DEBUG=${DEBUG} # Définit la variable d'environnement 'DEBUG' à 1 pour activer le mode débogage de Django.
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB} # Spécifie l'URL de connexion à la base de données PostgreSQL. 'db' fait référence au nom du service PostgreSQL défini ci-dessous.
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER} # Référence à la variable POSTGRES_USER dans le fichier .env.dev
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD} # Référence à la variable POSTGRES_PASSWORD dans le fichier .env.dev
+      - POSTGRES_DB=${POSTGRES_DB} # Spécifie l'URL de connexion à la base de données PostgreSQL. 'db' fait référence au nom du service PostgreSQL défini ci-dessous.
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
     depends_on:
       - db # Indique que le service backend dépend du service 'db' (PostgreSQL) et doit attendre que celui-ci soit démarré avant de démarrer lui-même.
     command: python manage.py runserver 0.0.0.0:8000 # Commande à exécuter lors du démarrage du conteneur backend. Ici, il démarre le serveur de développement Django.
