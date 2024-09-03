@@ -3,6 +3,8 @@ env/
 
 # Ignorer les fichiers de configuration sensibles
 .env
+.env.dev
+.env.prod
 
 # Ignorer les fichiers Python compilés
 __pycache__/
