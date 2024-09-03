@@ -4,6 +4,8 @@ venv/
 
 # Ignorer les fichiers de configuration locaux (variables sensibles)
 .env
+.env.dev
+.env.prod
 
 # Ignorer les fichiers Python compilés
 __pycache__/
