@@ -17,6 +17,8 @@ services: # Déclaration des services (conteneurs) que Docker Compose va gérer.
       dockerfile: Dockerfile.prod # Spécifie le Dockerfile à utiliser pour construire l'image Docker du backend. Ici, il utilise 'Dockerfile.prod' pour l'environnement de production.
     container_name: django_backend_prod # Nom du conteneur Docker pour le backend en production.
     environment:
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS} # Ici mettre toutes les variable d'environnement sinon ca bug
+      - SECRET_KEY=${SECRET_KEY}
       - DEBUG=${DEBUG} # Définit la variable d'environnement 'DEBUG' à 1 pour activer le mode débogage de Django.
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER} # Référence à la variable POSTGRES_USER dans le fichier .env.dev
@@ -26,7 +28,7 @@ services: # Déclaration des services (conteneurs) que Docker Compose va gérer.
       - DB_PORT=${DB_PORT}
     expose:
       - "8000" # Expose le port 8000 du backend pour que Nginx puisse y accéder. Ce port n'est pas mappé à l'extérieur directement.
-    command: gunicorn --bind 0.0.0.0:8000 nom_du_projet.wsgi:application # Utilise Gunicorn pour exécuter l'application Django, ce qui est recommandé en production.
+    command: gunicorn --bind 0.0.0.0:8000 manageyourflights.wsgi:application # Utilise Gunicorn pour exécuter l'application Django, ce qui est recommandé en production.
 
   db: # Service pour exécuter PostgreSQL en production.
     image: postgres:16 # Spécifie l'image Docker à utiliser pour le service PostgreSQL. Ici, la version 16 de PostgreSQL est utilisée.

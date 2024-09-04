@@ -12,14 +12,14 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv  # On ajoute dotenv pour le développement local
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Charger dotenv uniquement si on n'est pas dans Docker
+# Charger dotenv uniquement si on est en local (si la variable 'DOCKER' n'est pas définie)
 if not os.getenv('DOCKER'):
-	from dotenv import load_dotenv
-    load_dotenv()
+    load_dotenv(BASE_DIR / '.env')  # Charge le fichier .env local si on n'est pas dans Docker
 
 
 # Quick-start development settings - unsuitable for production
@@ -30,8 +30,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-key')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # ALLOWED_HOSTS
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
-
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Application definition
 

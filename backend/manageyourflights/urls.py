@@ -16,7 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.http import HttpResponse
+
+# Vue simple qui retourne un message HTTP
+def home_view(request):
+    return HttpResponse("Ça fonctionne!")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', home_view),
 ]

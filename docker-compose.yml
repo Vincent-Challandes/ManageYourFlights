@@ -9,6 +9,8 @@ services: # Déclaration des services (conteneurs) que Docker Compose va gérer.
     ports:
       - "8000:8000" # Mappe le port 8000 du conteneur au port 8000 de l'hôte (ta machine locale). Cela permet d'accéder au serveur Django via 'http://localhost:8000'.
     environment:
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS} # Ici mettre toutes les variable d'environnement sinon ca bug
+      - SECRET_KEY=${SECRET_KEY}
       - DEBUG=${DEBUG} # Définit la variable d'environnement 'DEBUG' à 1 pour activer le mode débogage de Django.
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER} # Référence à la variable POSTGRES_USER dans le fichier .env.dev
